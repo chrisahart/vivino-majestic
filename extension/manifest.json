@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Majestic Vivino",
+  "version": "1.0",
+  "description": "Majestic Vivino",
+  "content_scripts": [
+    {
+      "matches": ["https://www.majestic.co.uk/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
