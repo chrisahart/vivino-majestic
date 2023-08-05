@@ -1,3 +1,6 @@
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function getInvTagManagerParams() {
     const scripts = document.getElementsByTagName("script");
@@ -31,7 +34,6 @@ function getInvTagManagerParams() {
     }
   }
   
-    
   async function displayProductNames() {
     const products = findInvTagManagerParams();
   
@@ -54,43 +56,25 @@ function getInvTagManagerParams() {
   
         //  Fetch the rating value for each wine from vivino.com
         ratingValue = 1;
+        console.log('ratingValue ' + ratingValue);
+
+        const response = chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
+        console.log('response ' + response);
+        
+        // ratingValue = response.fetchVivinoData
+
 
         // (async () => {
-            // const response = await chrome.runtime.sendMessage({greeting: "hello"});
-            // do something with response here, not outside the function
-            // console.log(response);
+        //     const response = await chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
+        //     ratingValue = response.fetchVivinoData
+        //     // console.log('response.fetchVivinoData ' + response.fetchVivinoData);
+        //     console.log('async ratingValue ' + ratingValue);
         //   })();
 
-        chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName })
-        
-        // chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName }, (response) => {
-        //     if (response.error) {
-        //         console.log('error' + response);
-        //       document.getElementById('result').textContent = `Error: ${response.error}`;
-        //     } else {
-        //         console.log('else' + response);
-        //       document.getElementById('result').textContent = JSON.stringify(response, null, 2);
-        //     }
-        //   });
-        // const response = await fetch(vivinoUrl);
-        // const jsonData = response.json();
-        // textContent does not let the attacker inject HTML elements.
-        // document.getElementById("resp").textContent = jsonData;
-
-        // chrome.runtime.sendMessage({ type: 'image', url: vivinoUrl}, response => {console.log(response)})
-
-        //  getHtmlCodeFromUrl(vivinoUrl)
-        // .then((htmlCode) => {
-        //     const ratingValue = extractRatingValue(htmlCode);
-        //     if (ratingValue !== null) {
-        //     console.log(`Rating Value: ${ratingValue}`);
-        //     } else {
-        //     console.log('Rating Value not found.');
-        //     }
-        // })
-        // .catch((error) => {
-        //     console.error('Error:', error);
-        // });
+          // Sleep for 0.5 s to avoid sending too many requests to Vivino
+          await sleep(500);
+          
+          console.log('ratingValue ' + ratingValue);
   
         const vivinoSearchLink = document.createElement("a");
         vivinoSearchLink.textContent = productName;
@@ -111,4 +95,3 @@ function getInvTagManagerParams() {
   
   console.log("Hello from content script")
   displayProductNames();
-  
