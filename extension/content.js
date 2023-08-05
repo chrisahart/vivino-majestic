@@ -33,6 +33,12 @@ function getInvTagManagerParams() {
       return [];
     }
   }
+
+
+   function getRating(productName) {
+    const temp = chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
+    return temp;
+  }
   
   async function displayProductNames() {
     const products = findInvTagManagerParams();
@@ -58,21 +64,11 @@ function getInvTagManagerParams() {
         ratingValue = 1;
         console.log('ratingValue ' + ratingValue);
 
-        const response = chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
-        console.log('response ' + response);
+        const ratingValue_new = getRating(productName)
+        console.log('ratingValue_new ' + ratingValue_new);
         
-        // ratingValue = response.fetchVivinoData
-
-
-        // (async () => {
-        //     const response = await chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
-        //     ratingValue = response.fetchVivinoData
-        //     // console.log('response.fetchVivinoData ' + response.fetchVivinoData);
-        //     console.log('async ratingValue ' + ratingValue);
-        //   })();
-
-          // Sleep for 0.5 s to avoid sending too many requests to Vivino
-          await sleep(500);
+          // Sleep for 1 s to avoid sending too many requests to Vivino
+          await sleep(1000);
           
           console.log('ratingValue ' + ratingValue);
   
