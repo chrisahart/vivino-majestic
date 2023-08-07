@@ -1,108 +1,76 @@
-// To do:
-// Fix getRating() function to return value
-// Fix majestic html code to read all wines not just 10 
+function extractID(htmlSource) {
+  // Works on Vivino search page only, returns idValue of first search item
 
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  const idPattern = /"@id":"([^"]+)"/;
+  const idMatch = htmlSource.match(idPattern);
+  const idValue = idMatch ? idMatch[1] : null;
+  return idValue;
 }
 
-function getInvTagManagerParams() {
-    const scripts = document.getElementsByTagName("script");
-    let invTagManagerParamsValue = null;
-  
-    for (let i = 0; i < scripts.length; i++) {
-      const script = scripts[i];
-      const scriptContent = script.textContent;
-      if (scriptContent.includes("var invTagManagerParams")) {
-        const startIndex = scriptContent.indexOf("var invTagManagerParams");
-        const endIndex = scriptContent.indexOf(";", startIndex);
-        if (startIndex !== -1 && endIndex !== -1) {
-          invTagManagerParamsValue = scriptContent.slice(startIndex, endIndex + 1);
-          break;
-        }
+function extractRegion(htmlSource) {
+  // Works on Vivino search page only, returns wine region of first search item
+
+  const regex = /<a class="link-color-alt-grey" href="\/wine-regions[^>]*>([^<]+)<\/a>/;
+  const match = htmlSource.match(regex);
+  const value = match ? match[1] : null;
+
+  return value;
+}
+
+function extractRating(htmlSource) {
+  // Works on Vivino product page only, returns product ratingValue
+  const ratingPattern = /"ratingValue":"([^"]+)"/;
+  const ratingMatch = htmlSource.match(ratingPattern);
+  return ratingMatch ? parseFloat(ratingMatch[1]) : null;
+}
+
+function extractNameFromHtmlSource() {
+    // Works on Majestic wine search page only, returns productInfo
+  console.log("extractNameFromHtmlSource")
+  const productElements = document.querySelectorAll('a.product-name.t-not-link');
+  const majestic_names = [];
+  const majestic_id = [];
+  const majestic_price = [];
+
+  productElements.forEach((element) => {
+    const dataEnhancedProductClick = element.getAttribute('data-enhanced-productclick');
+    if (dataEnhancedProductClick) {
+      const productInfo = JSON.parse(dataEnhancedProductClick).productInfo;
+      if (productInfo && productInfo.name) {
+        majestic_names.push(productInfo.name);
+        majestic_id.push(productInfo.id);
+        majestic_price.push(productInfo.price);
       }
     }
-  
-    return invTagManagerParamsValue;
-  }
-  
-  function findInvTagManagerParams() {
-    const invTagManagerParamsValue = getInvTagManagerParams();
-    const regex = /"ProductDataLayer":\s*(\[.*?\])/s;
-    const match = invTagManagerParamsValue.match(regex);
-  
-    if (match && match[1]) {
-      return JSON.parse(match[1]);
-    } else {
-      return [];
-    }
-  }
+    
+  });
 
+  return [majestic_names, majestic_id, majestic_price];
+}
 
-   function getRating(productName) {
-    const temp = chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
-    // console.log('temp ' + Promise.resolve(temp));
+  
+  console.log("Start of content script")
+  const [majestic_names, majestic_id, majestic_price] = extractNameFromHtmlSource();
 
-    // let val; temp.then(function(value) => { val = data }); return val
+    console.log("Found " + majestic_names.length + " wines")
 
-    // temp.then(function(value) {
-    //     console.log('value ' + value.fetchVivinoData);
-    //     for(var property in value.fetchVivinoData) {
-    //         alert(property + "=" + value.fetchVivinoData[property]);
-    //     }
-    //   });
-    return temp;
-  }
-  
-  async function displayProductNames() {
-    const products = findInvTagManagerParams();
-  
-    if (products.length > 0) {
-      const productNamesElement = document.createElement("div");
-      productNamesElement.style.position = "fixed";
-      productNamesElement.style.bottom = "20px";
-      productNamesElement.style.right = "20px";
-      productNamesElement.style.background = "#fff";
-      productNamesElement.style.padding = "5px";
-      productNamesElement.style.border = "1px solid #ccc";
-      productNamesElement.style.maxWidth = "1000px";
-  
-      productNamesElement.textContent = `Detected ${products.length} wines:`;
-  
-      for (const product of products) {
-        const productNameElement = document.createElement("div");
-        const productName = product.name;
-        const vivinoUrl = `https://www.vivino.com/search/wines?q=${encodeURIComponent(productName)}`;
-  
-        //  Fetch the rating value for each wine from vivino.com
-        ratingValue = 1;
-        console.log('ratingValue ' + ratingValue);
+    majestic_names.forEach((name, index) => {
 
-        const ratingValue_new = getRating(productName)
-        console.log('ratingValue_new ' + ratingValue_new);
-        
-          // Sleep for 1 s to avoid sending too many requests to Vivino
-          await sleep(1000);
-          
-          console.log('ratingValue ' + ratingValue);
-  
-        const vivinoSearchLink = document.createElement("a");
-        vivinoSearchLink.textContent = productName;
-        vivinoSearchLink.href = vivinoUrl;
-        vivinoSearchLink.target = "_blank";
-  
-        const ratingElement = document.createElement("span");
-        ratingElement.textContent = ` - Rating: ${ratingValue}`;
-  
-        productNameElement.appendChild(vivinoSearchLink);
-        productNameElement.appendChild(ratingElement);
-        productNamesElement.appendChild(productNameElement);
-      }
-  
-      document.body.appendChild(productNamesElement);
-    }
-  }
-  
-  console.log("Hello from content script")
-  displayProductNames();
+      console.log('Processing wine number ' + index)
+
+  const productName = name.replace(/[^\w\s]/g, '');
+  const URL = `https://www.vivino.com/search/wines?q=${encodeURIComponent(productName)}`;
+
+  chrome.runtime.sendMessage({ action: 'fetchHTML', website: URL}, response => {
+    const ID = extractID(response)
+    const Region = extractRegion(response)
+
+    chrome.runtime.sendMessage({ action: 'fetchHTML', website: ID}, response => {
+      const Rating = extractRating(response)
+
+      // Data processing log
+      console.log(majestic_id[index] + ", " + productName + ", " + 
+                  majestic_price[index] + ", " + Region + ", " + Rating)
+    })
+  })
+});
