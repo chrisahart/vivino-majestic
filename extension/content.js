@@ -43,14 +43,8 @@ function extractNameFromHtmlSource() {
       }
     }
   });
-
-  //  Sort by majestic_price ascending
-  const sortedIndex = majestic_price.map((_, index) => index).sort((a, b) => majestic_price[a] - majestic_price[b]);
-  const sortedNames = sortedIndex.map((index) => majestic_names[index]);
-  const sortedIds = sortedIndex.map((index) => majestic_id[index]);
-  const sortedPrices = sortedIndex.map((index) => majestic_price[index]);
-
-  return [sortedNames, sortedIds, sortedPrices];
+  
+  return [majestic_names, majestic_id, majestic_price];
 }
 
  function displayProductNames() {
@@ -73,10 +67,10 @@ function extractNameFromHtmlSource() {
       console.log('Processing wine number ' + index)
       console.log('Price ' + majestic_price[index]) 
 
-
       const productNameElement = document.createElement("div");
 
   const productName = name.replace(/[^\w\s]/g, '');
+ 
   const URL = `https://www.vivino.com/search/wines?q=${encodeURIComponent(productName)}`;
 
   chrome.runtime.sendMessage({ action: 'fetchHTML', website: URL}, response => {
@@ -111,5 +105,5 @@ function extractNameFromHtmlSource() {
 
   console.log("Start of content script")
   displayProductNames();
-
+  console.log("End of content script")
     
