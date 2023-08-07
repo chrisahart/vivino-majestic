@@ -1,3 +1,8 @@
+// To do:
+// Fix getRating() function to return value
+// Fix majestic html code to read all wines not just 10 
+
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -37,6 +42,16 @@ function getInvTagManagerParams() {
 
    function getRating(productName) {
     const temp = chrome.runtime.sendMessage({ action: 'fetchVivinoData', productName: productName });
+    // console.log('temp ' + Promise.resolve(temp));
+
+    // let val; temp.then(function(value) => { val = data }); return val
+
+    // temp.then(function(value) {
+    //     console.log('value ' + value.fetchVivinoData);
+    //     for(var property in value.fetchVivinoData) {
+    //         alert(property + "=" + value.fetchVivinoData[property]);
+    //     }
+    //   });
     return temp;
   }
   
