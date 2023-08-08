@@ -43,14 +43,81 @@ function extractNameFromHtmlSource() {
       }
     }
   });
-  
+
   return [majestic_names, majestic_id, majestic_price];
 }
 
- function displayProductNames() {
+async function displayProductNames() {
   const [majestic_names, majestic_id, majestic_price] = extractNameFromHtmlSource();
 
   if (majestic_names.length > 0) {
+    const productTable = document.createElement("table");
+    productTable.style.borderCollapse = "collapse";
+    productTable.style.width = "100%";
+
+    // Table header
+    const headerRow = document.createElement("tr");
+    const headerNames = ["Product Name", "Rating", "Price", "Region"];
+    headerNames.forEach((headerName) => {
+      const th = document.createElement("th");
+      th.style.border = "1px solid #ccc";
+      th.textContent = headerName;
+      headerRow.appendChild(th);
+    });
+    productTable.appendChild(headerRow);
+
+    // Helper function to fetch data for each wine and add it to the table
+    async function processWine(index) {
+      const productName = majestic_names[index].replace(/[^\w\s]/g, '');
+      const URL = `https://www.vivino.com/search/wines?q=${encodeURIComponent(productName)}`;
+
+      const response = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({ action: 'fetchHTML', website: URL }, resolve);
+      });
+
+      const ID = extractID(response);
+      const Region = extractRegion(response);
+
+      const responseRating = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({ action: 'fetchHTML', website: ID }, resolve);
+      });
+
+      const Rating = extractRating(responseRating);
+
+      const row = document.createElement("tr");
+
+      const productNameCell = document.createElement("td");
+      const productNameLink = document.createElement("a");
+      productNameLink.textContent = productName;
+      productNameLink.href = ID;
+      productNameLink.target = "_blank"; // Opens the link in a new tab
+      productNameCell.appendChild(productNameLink);
+      productNameCell.style.border = "1px solid #ccc";
+
+      const ratingCell = document.createElement("td");
+      ratingCell.textContent = Rating ? Rating.toFixed(2) : 'N/A';
+      ratingCell.style.border = "1px solid #ccc";
+
+      const priceCell = document.createElement("td");
+      priceCell.textContent = majestic_price[index];
+      priceCell.style.border = "1px solid #ccc";
+
+      const regionCell = document.createElement("td");
+      regionCell.textContent = Region ? Region : 'N/A';
+      regionCell.style.border = "1px solid #ccc";
+
+      row.appendChild(productNameCell);
+      row.appendChild(ratingCell);
+      row.appendChild(priceCell);
+      row.appendChild(regionCell);
+      productTable.appendChild(row);
+    }
+
+    // Process wines in order and add them to the table
+    for (let i = 0; i < majestic_names.length; i++) {
+      await processWine(i);
+    }
+
     const productNamesElement = document.createElement("div");
     productNamesElement.style.position = "fixed";
     productNamesElement.style.bottom = "20px";
@@ -60,48 +127,11 @@ function extractNameFromHtmlSource() {
     productNamesElement.style.border = "1px solid #ccc";
     productNamesElement.style.maxWidth = "1000px";
 
-    productNamesElement.textContent = `Detected ${majestic_names.length} wines:`;
-
-    majestic_names.forEach((name, index) => {
-
-      console.log('Processing wine number ' + index)
-      console.log('Price ' + majestic_price[index]) 
-
-      const productNameElement = document.createElement("div");
-
-  const productName = name.replace(/[^\w\s]/g, '');
- 
-  const URL = `https://www.vivino.com/search/wines?q=${encodeURIComponent(productName)}`;
-
-  chrome.runtime.sendMessage({ action: 'fetchHTML', website: URL}, response => {
-    const ID = extractID(response)
-    const Region = extractRegion(response)
-
-    chrome.runtime.sendMessage({ action: 'fetchHTML', website: ID}, response => {
-      const Rating = extractRating(response)
-
-      // Data processing log
-      console.log(majestic_id[index] + ", " + productName + ", " + 
-                  majestic_price[index] + ", " + Region + ", " + Rating)
-         
-        const vivinoSearchLink = document.createElement("a");
-        vivinoSearchLink.textContent = productName;
-        vivinoSearchLink.href = ID;
-        vivinoSearchLink.target = "_blank";
-  
-        const ratingElement = document.createElement("span");
-        ratingElement.textContent = `, Rating: ${Rating}, Price: ${ majestic_price[index]}`;
-  
-        productNameElement.appendChild(vivinoSearchLink);
-        productNameElement.appendChild(ratingElement);
-        productNamesElement.appendChild(productNameElement);
-
-      })
-    })
-  })
-  document.body.appendChild(productNamesElement);
+    productNamesElement.appendChild(productTable);
+    document.body.appendChild(productNamesElement);
+  }
 }
-}
+
 
   console.log("Start of content script")
   displayProductNames();
