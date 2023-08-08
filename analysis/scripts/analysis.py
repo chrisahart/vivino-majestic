@@ -34,9 +34,16 @@ def func_plot_country_region(func_fig, func_ax, func_data_1, func_markers, func_
 
     # Plot line for each region in country
     for counter in range(len(indexes)):
-        if counter == len(indexes) - 1:  # End of array
+        if counter == len(indexes) - 1 and indexes[counter] == func_data_1.shape[0] - 1:  # End of array single valued
             func_ax.plot(func_data_1.at[indexes[counter], 'Price'],
                          func_data_1.at[indexes[counter], 'Rating'], linestyle='None',
+                         marker=func_markers[counter], fillstyle='none', color=func_colors(counter / len(indexes)),
+                         label=unescape(func_data_1.at[indexes[counter], 'Region']))
+        elif counter == len(indexes) - 1:  # End of array multi-valued
+            dataframe_extracted = func_data_1.loc[indexes[counter]:]
+            dataframe_extracted_sorted = dataframe_extracted.sort_values('Price')
+            dataframe_extracted_sorted = dataframe_extracted_sorted.reset_index(drop=True)
+            func_ax.plot(dataframe_extracted_sorted['Price'], dataframe_extracted_sorted['Rating'],
                          marker=func_markers[counter], fillstyle='none', color=func_colors(counter / len(indexes)),
                          label=unescape(func_data_1.at[indexes[counter], 'Region']))
         elif indexes[counter + 1] == indexes[counter] + 1:  # Single valued region
@@ -121,7 +128,7 @@ for i in range(len(data_all)):
     data_all[i] = data_all[i].reset_index(drop=True)
 
 # Save wines with rating_above and price_below
-rating_above = 4
+rating_above = 4.0
 price_below = 20
 cols = ['Product Name', 'Rating', 'Price', 'Region', 'Country']
 wines_selected = pandas.DataFrame(columns=cols)
@@ -173,10 +180,20 @@ fig_plot_spain.savefig('{}/plots/price_rating_spain.png'.format(folder), dpi=dpi
 # Plot all wine regions for France
 plot_country = 2
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
+
+# Keep only above 4.0 and below £20, or wine regions with multiple values
+# regions_to_keep = ['Beaujolais', 'Vin de France', 'Côtes-du-Rhône', 'Bordeaux', 'Saint-Émilion Grand Cru', 'Montagne-Saint-Émilion',
+#                    'Côtes du Roussillon Villages', 'Bordeaux Supérieur', 'La Clape', 'Morgon', 'Pays d&#39;Oc']
+# data_country_regions = data_country_regions.query("Region in @regions_to_keep")
+# data_country_regions = data_country_regions.reset_index(drop=True)
+
 fig_plot_france, ax_plot_france = plt.subplots(figsize=(fig_size[0], fig_size[1]))
+# ig_plot_france, ax_plot_france = \
+#     func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, func_xlim=[6, 21], legend=True)
 fig_plot_france, ax_plot_france = \
-    func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, legend=True, legend_size=5.5)
+    func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, legend=True, legend_size=5.8)
 fig_plot_france.tight_layout()
+# fig_plot_france.savefig('{}/plots/price_rating_france_minimal.png'.format(folder), dpi=dpi)
 fig_plot_france.savefig('{}/plots/price_rating_france.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for New Zealand
