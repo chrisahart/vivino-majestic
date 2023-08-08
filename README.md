@@ -1,4 +1,4 @@
-# Majestic + Vivino Chrome extension
+# Majestic wines + Vivino Chrome extension
 
 Extension to display Vivino wine score on Majestic wines, to aid in purchasing decisions. 
 
