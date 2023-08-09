@@ -114,7 +114,8 @@ delete_wines = ['Domaine Paul Mas Ct Mas 2021 Languedoc Rouge',
                 'Penfolds Father Grand Tawny Australia',
                 'Taylors LBV Port Decanter 201718 50cl',
                 'Porta 6 Reserva 201920 Portugal',
-                'Inglenook Rubicon 2013 Rutherford']
+                'Inglenook Rubicon 2013 Rutherford',
+                'Porta 6 Red 6 Bottle Wine Case']
 for i in range(len(data_all)):
     for j in range(len(delete_wines)):
         data_all[i] = data_all[i][data_all[i]['Product Name'] != delete_wines[j]]
@@ -128,7 +129,7 @@ for i in range(len(data_all)):
     data_all[i] = data_all[i].reset_index(drop=True)
 
 # Save wines with rating_above and price_below
-rating_above = 4.2
+rating_above = 3.8
 price_below = 20
 cols = ['Product Name', 'Rating', 'Price', 'Region', 'Country']
 wines_selected = pandas.DataFrame(columns=cols)
@@ -166,102 +167,102 @@ plot_country = 0
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_italy, ax_plot_italy = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_italy, ax_plot_italy = \
-    func_plot_country_region(fig_plot_italy, ax_plot_italy, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_italy, ax_plot_italy, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_italy.tight_layout()
-# fig_plot_italy.savefig('{}/plots/price_rating_italy.png'.format(folder), dpi=dpi)
-fig_plot_italy.savefig('{}/plots/price_rating_italy-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_italy.savefig('{}/plots/price_rating_italy.png'.format(folder), dpi=dpi)
+# fig_plot_italy.savefig('{}/plots/price_rating_italy-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for Spain
 plot_country = 1
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_spain, ax_plot_spain = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_spain, ax_plot_spain = \
-    func_plot_country_region(fig_plot_spain, ax_plot_spain, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_spain, ax_plot_spain, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_spain.tight_layout()
-# fig_plot_spain.savefig('{}/plots/price_rating_spain.png'.format(folder), dpi=dpi)
-fig_plot_spain.savefig('{}/plots/price_rating_spain-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_spain.savefig('{}/plots/price_rating_spain.png'.format(folder), dpi=dpi)
+# fig_plot_spain.savefig('{}/plots/price_rating_spain-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for France
 plot_country = 2
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 
 # Keep only above 4.0 and below £20, or wine regions with multiple values
-# regions_to_keep = ['Beaujolais', 'Vin de France', 'Côtes-du-Rhône', 'Bordeaux', 'Saint-Émilion Grand Cru', 'Montagne-Saint-Émilion',
-#                    'Côtes du Roussillon Villages', 'Bordeaux Supérieur', 'La Clape', 'Morgon', 'Pays d&#39;Oc']
-# data_country_regions = data_country_regions.query("Region in @regions_to_keep")
-# data_country_regions = data_country_regions.reset_index(drop=True)
+regions_to_keep = ['Beaujolais', 'Vin de France', 'Côtes-du-Rhône', 'Bordeaux', 'Saint-Émilion Grand Cru', 'Montagne-Saint-Émilion',
+                   'Côtes du Roussillon Villages', 'Bordeaux Supérieur', 'La Clape', 'Morgon', 'Pays d&#39;Oc']
+data_country_regions = data_country_regions.query("Region in @regions_to_keep")
+data_country_regions = data_country_regions.reset_index(drop=True)
 
 fig_plot_france, ax_plot_france = plt.subplots(figsize=(fig_size[0], fig_size[1]))
-# ig_plot_france, ax_plot_france = \
-#     func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, func_xlim=[6, 21], legend=True)
+fig_plot_france, ax_plot_france = \
+    func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, func_xlim=[6, 21], legend=True)
 # fig_plot_france, ax_plot_france = \
 #     func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, legend=True, legend_size=5.8)
-fig_plot_france, ax_plot_france = \
-    func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, legend=True, plot_singles=False)
+# fig_plot_france, ax_plot_france = \
+#     func_plot_country_region(fig_plot_france, ax_plot_france, data_country_regions, markers, cm, legend=True, plot_singles=False)
 fig_plot_france.tight_layout()
-# fig_plot_france.savefig('{}/plots/price_rating_france_minimal.png'.format(folder), dpi=dpi)
+fig_plot_france.savefig('{}/plots/price_rating_france_minimal.png'.format(folder), dpi=dpi)
 # fig_plot_france.savefig('{}/plots/price_rating_france.png'.format(folder), dpi=dpi)
-fig_plot_france.savefig('{}/plots/price_rating_france-multiple-regions-only.png'.format(folder), dpi=dpi)
+# fig_plot_france.savefig('{}/plots/price_rating_france-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for New Zealand
 plot_country = 3
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_new_zealand, ax_plot_new_zealand = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_new_zealand, ax_plot_new_zealand = \
-    func_plot_country_region(fig_plot_new_zealand, ax_plot_new_zealand, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_new_zealand, ax_plot_new_zealand, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_new_zealand.tight_layout()
-# fig_plot_new_zealand.savefig('{}/plots/price_rating_new_zealand.png'.format(folder), dpi=dpi)
-fig_plot_new_zealand.savefig('{}/plots/price_rating_new_zealand-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_new_zealand.savefig('{}/plots/price_rating_new_zealand.png'.format(folder), dpi=dpi)
+# fig_plot_new_zealand.savefig('{}/plots/price_rating_new_zealand-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for USA
 plot_country = 4
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_american, ax_plot_american = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_american, ax_plot_american = \
-    func_plot_country_region(fig_plot_american, ax_plot_american, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_american, ax_plot_american, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_american.tight_layout()
-# fig_plot_american.savefig('{}/plots/price_rating_american.png'.format(folder), dpi=dpi)
-fig_plot_american.savefig('{}/plots/price_rating_american-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_american.savefig('{}/plots/price_rating_american.png'.format(folder), dpi=dpi)
+# fig_plot_american.savefig('{}/plots/price_rating_american-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for Australia
 plot_country = 5
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_australian, ax_plot_australian = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_australian, ax_plot_australian = \
-    func_plot_country_region(fig_plot_australian, ax_plot_australian, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_australian, ax_plot_australian, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_australian.tight_layout()
-# fig_plot_australian.savefig('{}/plots/price_rating_australian.png'.format(folder), dpi=dpi)
-fig_plot_australian.savefig('{}/plots/price_rating_australian-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_australian.savefig('{}/plots/price_rating_australian.png'.format(folder), dpi=dpi)
+# fig_plot_australian.savefig('{}/plots/price_rating_australian-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for Portugeuse
 plot_country = 7
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_portugeuse, ax_plot_portugeuse = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_portugeuse, ax_plot_portugeuse = \
-    func_plot_country_region(fig_plot_portugeuse, ax_plot_portugeuse, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_portugeuse, ax_plot_portugeuse, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_portugeuse.tight_layout()
-# fig_plot_portugeuse.savefig('{}/plots/price_rating_portugeuse.png'.format(folder), dpi=dpi)
-fig_plot_portugeuse.savefig('{}/plots/price_rating_portugeuse-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_portugeuse.savefig('{}/plots/price_rating_portugeuse.png'.format(folder), dpi=dpi)
+# fig_plot_portugeuse.savefig('{}/plots/price_rating_portugeuse-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for Argentinian
 plot_country = 8
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_argentinian, ax_plot_argentinian = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_argentinian, ax_plot_argentinian = \
-    func_plot_country_region(fig_plot_argentinian, ax_plot_argentinian, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_argentinian, ax_plot_argentinian, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_argentinian.tight_layout()
-# fig_plot_argentinian.savefig('{}/plots/price_rating_argentinian.png'.format(folder), dpi=dpi)
-fig_plot_argentinian.savefig('{}/plots/price_rating_argentinian-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_argentinian.savefig('{}/plots/price_rating_argentinian.png'.format(folder), dpi=dpi)
+# fig_plot_argentinian.savefig('{}/plots/price_rating_argentinian-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 # Plot all wine regions for Chilean
 plot_country = 9
 data_country_regions = data_all[plot_country].sort_values('Region').reset_index(drop=True)
 fig_plot_chilean, ax_plot_chilean = plt.subplots(figsize=(fig_size[0], fig_size[1]))
 fig_plot_chilean, ax_plot_chilean = \
-    func_plot_country_region(fig_plot_chilean, ax_plot_chilean, data_country_regions, markers, cm, legend=True, plot_singles=False)
+    func_plot_country_region(fig_plot_chilean, ax_plot_chilean, data_country_regions, markers, cm, legend=True, plot_singles=True)
 fig_plot_chilean.tight_layout()
-# fig_plot_chilean.savefig('{}/plots/price_rating_chilean.png'.format(folder), dpi=dpi)
-fig_plot_chilean.savefig('{}/plots/price_rating_chilean-multiple-regions-only.png'.format(folder), dpi=dpi)
+fig_plot_chilean.savefig('{}/plots/price_rating_chilean.png'.format(folder), dpi=dpi)
+# fig_plot_chilean.savefig('{}/plots/price_rating_chilean-multiple-regions-only.png'.format(folder), dpi=dpi)
 
 if __name__ == "__main__":
     print('Finished.')
